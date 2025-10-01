@@ -3,9 +3,10 @@ r = redis.Redis(host='10.1.68.172', port=6379, db=0)
 r.ping()
 
 
-r.set("777", "p1", "2")
+r.hset("777", "p1", "2")
+r.hset("777", "p2", "")
 
-while (True):
+while(True):
     dados = r.hgetall("777")
     p1 = dados["p1".encode()].decode()
     p2 = dados["p2".encode()].decode()
