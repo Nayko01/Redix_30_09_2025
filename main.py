@@ -1,28 +1,14 @@
-### Estabelecendo conexão ###
-
 import redis
 r = redis.Redis(host='10.1.68.172', port=6379, db=0)
 r.ping()
-# True
 
-# ### Inserindo Dados ###
 
-r.set('Caio_mykey', 'myvalue')
-# True
+r.set("777", "p1", "2")
 
-# ### Obtendo Dados ###
-
-name = r.get('Caio_mykey')
-print(name.decode())
-# myvalue
-
-# ### Removendo Dados ###
-
-r.delete('Caio_mykey')
-# 1
-name = r.get('Caio_mykey')
-print(name.decode())
-# Traceback (most recent call last):
-# File "", line 1, in print(name.decode())
-# ^^^^^^^^^^^
-# AttributeError: 'NoneType' object has no attribute 'decode'
+while (True):
+    dados = r.hgetall("777")
+    p1 = dados["p1".encode()].decode()
+    p2 = dados["p2".encode()].decode()
+    if p1 != "" and p2 != "":
+        print(p1, p2)
+        exit()
