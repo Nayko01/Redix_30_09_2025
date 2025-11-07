@@ -1,10 +1,10 @@
 import redis
-r = redis.Redis(host='10.1.68.172', port=6379, db=0)
+r = redis.Redis(host='localhost', port=6379, db=0)
 r.ping()
 
 
 r.hset("777", "p1", "2")
-r.hset("777", "p2", "")
+r.hset("777", "p2", "3")
 
 while(True):
     dados = r.hgetall("777")
