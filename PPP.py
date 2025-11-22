@@ -3,17 +3,19 @@ def player1():
     print("Jogador 1, digite seu nome:")
     jogador1 = input()
     nome1 = jogador1
-        
+
     print("Criando sala de jogo...")
-        
+
     sala = f"{random.randint(1, 10000):05.0f}"
-        
+
     print(f"Seu número de sala é: {sala}. Forneça este número ao Jogador 2 para que ele possa se conectar.")
 
     # grava os campos `jogador1` e `jogador2` dentro do hash da sala
     r.hset(f"sala:{sala}", "jogador1", nome1)
-    r.hset(f"sala:{sala}","jogador2", "")
-    r.hset(f"sala:{sala}","jogada1", "")                                
+    r.hset(f"sala:{sala}", "jogador2", "")
+    r.hset(f"sala:{sala}", "jogada1", "")
+    r.hset(f"sala:{sala}", "status", "")
+    r.hset(f"sala:{sala}", "ack", 0)
 
     return sala, nome1
 
@@ -39,6 +41,19 @@ def jogada2():
     r.hset(f"sala:{sala}","jogada2", jogada2)
     return jogada2
 
+def remover_sala(sala):
+    key = f"sala:{sala}"
+    try:
+        removed = r.delete(key)
+        if removed:
+            print(f"Sala {sala} removida do Redis.")
+            return True
+        else:
+            print(f"Sala {sala} não encontrada no Redis.")
+            return False
+    except redis.RedisError as e:
+        print(f"Erro ao remover sala {sala}: {e}")
+        return False
 
 import redis
 import random
@@ -104,6 +119,7 @@ while not (jogou1 and jogou2):
     jogou1 = dados.get("jogada1", "")
     jogou2 = dados.get("jogada2", "")
 
+
 print("Ambos os jogadores fizeram suas jogadas.")
 print(f"Jogador 1 jogou: {jogou1}")
 print(f"Jogador 2 jogou: {jogou2}")
@@ -114,10 +130,17 @@ elif (jogou1 == "pedra" and jogou2 == "tesoura") or (jogou1 == "papel" and jogou
 else:
     print("Jogador 2 vence!")
 
-r.get(key)
-remocao = r.delete(key)
-if remocao == 1:    
-    print("Jogo encerrado. Dados da sala removidos do Redis.")
+r.hset(f"sala:{sala}","status", "finalizado")
+# incrementa confirmação (ack) para indicar que este cliente chegou ao final
+ack = r.hincrby(key, "ack", 1)
+if ack == 1:
+    # primeiro a reconhecer, define um TTL como fallback caso o outro jogador não confirme
+    r.expire(key, 30)
 
+if ack >= 2:
+    # ambos confirmaram — remover a sala com segurança
+    remover_sala(sala)
+else:
+    print(f"Sala {sala} finalizada — aguardando confirmação do outro jogador (ack={ack}).")
 
 
