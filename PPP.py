@@ -134,9 +134,7 @@ r.hset(f"sala:{sala}","status", "finalizado")
 # incrementa confirmação (ack) para indicar que este cliente chegou ao final
 ack = r.hincrby(key, "ack", 1)
 if ack == 1:
-    # primeiro a reconhecer, define um TTL como fallback caso o outro jogador não confirme
     r.expire(key, 30)
-
 if ack >= 2:
     # ambos confirmaram — remover a sala com segurança
     remover_sala(sala)
