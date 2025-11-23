@@ -14,7 +14,6 @@ def player1():
     r.hset(f"sala:{sala}", "jogador1", nome1)
     r.hset(f"sala:{sala}", "jogador2", "")
     r.hset(f"sala:{sala}", "jogada1", "")
-    r.hset(f"sala:{sala}", "status", "")
     r.hset(f"sala:{sala}", "ack", 0)
 
     return sala, nome1
@@ -130,7 +129,6 @@ elif (jogou1 == "pedra" and jogou2 == "tesoura") or (jogou1 == "papel" and jogou
 else:
     print("Jogador 2 vence!")
 
-r.hset(f"sala:{sala}","status", "finalizado")
 # incrementa confirmação (ack) para indicar que este cliente chegou ao final
 ack = r.hincrby(key, "ack", 1)
 if ack == 1:
