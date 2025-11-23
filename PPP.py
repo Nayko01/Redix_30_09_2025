@@ -1,4 +1,3 @@
-
 def player1():
     print("Jogador 1, digite seu nome:")
     jogador1 = input()
